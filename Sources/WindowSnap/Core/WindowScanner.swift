@@ -166,6 +166,7 @@ enum WindowScanner {
             subrole: subrole,
             frame: Frame(rect),
             displayID: display?.id ?? CGMainDisplayID(),
+            displayUUID: display?.uuid,
             displayIndex: display?.index ?? 0,
             displayName: display?.name ?? "主显示器",
             displayFrame: Frame(displayFrame),

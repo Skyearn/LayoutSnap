@@ -65,11 +65,16 @@ enum SelfTest {
 
         let resolved = ScreenGeometry.resolveTarget(for: snapshot)
         check(resolved.remapped, "显示器不存在时标记为重投影")
-        let screens = ScreenGeometry.currentDisplays
-        if let first = screens.first {
-            check(resolved.frame.width > 0 && resolved.frame.height > 0, "重投影得到有效尺寸")
-            let intersection = resolved.frame.intersection(first.frame)
-            check(!intersection.isNull && intersection.width > 0, "重投影后至少有一部分在当前屏幕上")
+        check(resolved.frame.width > 0 && resolved.frame.height > 0, "重投影得到有效尺寸")
+
+        // 原屏幕已经拔掉，落到哪块屏上都行，但必须实实在在落在某块现有屏幕上
+        let currentScreens = ScreenGeometry.currentDisplays
+        if currentScreens.isEmpty == false {
+            let landed = currentScreens.contains { display in
+                let intersection = resolved.frame.intersection(display.frame)
+                return intersection.isNull == false && intersection.width > 0
+            }
+            check(landed, "重投影后落在当前某块屏幕上")
         }
 
         group("窗口匹配打分")
@@ -403,6 +408,74 @@ enum SelfTest {
         check(AppSettings(defaults: perfDefaults).parallelWorkers == 8, "并行数改动会持久化")
         check(perfSettings.restorerOptions.maxConcurrentApps == 8, "恢复选项跟着设置走")
         perfDefaults.removePersistentDomain(forName: perfSuite)
+
+        group("显示器识别（重启后 displayID 会变）")
+
+        // 模拟：显示器排列没变，但重启后 id 被重新分配了
+        let mainScreen = DisplayInfo(id: 1, uuid: "UUID-MAIN", index: 0, name: "F27G60U",
+                                     frame: CGRect(x: 0, y: 0, width: 1920, height: 1080),
+                                     visibleFrame: CGRect(x: 0, y: 25, width: 1920, height: 1055))
+        let leftScreen = DisplayInfo(id: 2, uuid: "UUID-LEFT", index: 1, name: "TYPE-C",
+                                     frame: CGRect(x: -1920, y: 0, width: 1920, height: 1080),
+                                     visibleFrame: CGRect(x: -1920, y: 25, width: 1920, height: 1055))
+        let testScreens = [mainScreen, leftScreen]
+
+        // 保存时这个窗口在主屏上，当时主屏的 id 是 9
+        let savedFrame = CGRect(x: 0, y: 30, width: 1920, height: 1050)
+        let savedDisplayFrame = CGRect(x: 0, y: 0, width: 1920, height: 1080)
+        var savedWindow = WindowSnapshot(
+            bundleID: "com.apple.Safari", appName: "Safari", title: "个人",
+            role: "AXWindow", subrole: "AXStandardWindow",
+            frame: Frame(savedFrame),
+            displayID: 9,
+            displayUUID: "UUID-MAIN",
+            displayIndex: 0,
+            displayName: "F27G60U",
+            displayFrame: Frame(savedDisplayFrame),
+            relativeFrame: Frame(savedFrame).relative(to: savedDisplayFrame),
+            isMinimized: false, isFullScreen: false, zIndex: 0)
+
+        // 这是用户报的那个 bug：重启后 id=2 被左边那块屏占用了，
+        // 老逻辑按 id 找屏，会把窗口甩到 TYPE-C 上
+        savedWindow.displayID = 2
+        let bugMatched = ScreenGeometry.matchDisplay(for: savedWindow, in: testScreens)
+        check(bugMatched?.uuid == "UUID-MAIN", "displayID 被别的屏占用时，按 UUID 找到原来那块屏")
+        check(bugMatched?.name == "F27G60U", "匹配到的是主屏，而不是 TYPE-C")
+
+        let bugResolved = ScreenGeometry.resolveTarget(for: savedWindow, in: testScreens)
+        check(bugResolved.display.uuid == "UUID-MAIN", "恢复目标锁定在主屏")
+        check(bugResolved.remapped == false, "屏幕没挪窝时用绝对坐标，不做重投影")
+        check(rectEqual(bugResolved.frame, savedFrame), "位置尺寸原样还原")
+
+        // 屏幕整体挪到别的坐标（排列变了）-> 应该按相对坐标投影
+        let movedMain = DisplayInfo(id: 1, uuid: "UUID-MAIN", index: 0, name: "F27G60U",
+                                    frame: CGRect(x: 1920, y: 0, width: 1920, height: 1080),
+                                    visibleFrame: CGRect(x: 1920, y: 25, width: 1920, height: 1055))
+        let movedResolved = ScreenGeometry.resolveTarget(for: savedWindow, in: [movedMain, leftScreen])
+        check(movedResolved.remapped, "屏幕位置变了会标记为重投影")
+        check(movedResolved.frame.minX >= 1920 - 8, "重投影之后落在屏幕的新位置上")
+
+        // 老数据没有 UUID：靠「屏幕矩形一模一样」也能认出来
+        var legacy = savedWindow
+        legacy.displayUUID = nil
+        legacy.displayID = 99
+        let legacyMatched = ScreenGeometry.matchDisplay(for: legacy, in: testScreens)
+        check(legacyMatched?.uuid == "UUID-MAIN", "没有 UUID 的老数据按屏幕矩形匹配")
+
+        // 换成一台全新的显示器：老的 UUID 和矩形都对不上，退到按序号
+        var brandNew = savedWindow
+        brandNew.displayUUID = "UUID-OTHER"
+        brandNew.displayID = 77
+        let fallback = ScreenGeometry.matchDisplay(for: brandNew, in: testScreens)
+        check(fallback?.index == brandNew.displayIndex, "认不出显示器时按保存时的屏幕序号退化")
+
+        group("显示器缓存的失效")
+
+        let cachedBefore = ScreenGeometry.currentDisplays.count
+        ScreenGeometry.invalidateDisplayCache()
+        check(ScreenGeometry.currentDisplays.count == cachedBefore, "清缓存后重新查询显示器数量一致")
+        check(ScreenGeometry.persistentUUID(of: CGMainDisplayID()).isEmpty == false,
+              "主屏能取到稳定的 EDID UUID")
 
         print("")
         print("通过 \(passed) 项，失败 \(failed) 项")

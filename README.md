@@ -221,13 +221,14 @@ tail -f ~/Library/Logs/WindowSnap/WindowSnap.log
 APP=/Applications/WindowSnap.app/Contents/MacOS/WindowSnap
 
 $APP --doctor              # 检查权限、显示器、功能快捷键与已保存的布局
+$APP --check-layout "工作"  # 只计算每条记录会落到哪块屏上，不移动任何窗口
 $APP --scan                # 列出当前所有窗口（位置、尺寸、所在显示器）
 $APP --scan --json         # 同上，JSON 输出
 $APP --save "家里"          # 将所有窗口保存为布局
 $APP --save-window 3 "看板"  # 仅将 --scan 列表中的第 3 个窗口保存为布局
 $APP --restore "家里"       # 恢复布局
 $APP --list                # 列出已保存的布局
-$APP --selftest            # 运行内置自检（111 项断言）
+$APP --selftest            # 运行内置自检（122 项断言）
 ```
 
 `--selftest` 不需要辅助功能权限，可随时用于验证代码正确性；CI 中运行的即为该命令。
@@ -351,7 +352,7 @@ Sources/WindowSnap/
     AppController.swift           核心调度：菜单、热键、系统通知
     StatusBarController.swift     菜单栏图标状态机与菜单
     CLI.swift                     命令行模式
-    SelfTest.swift                不依赖权限的自检（111 项）
+    SelfTest.swift                不依赖权限的自检（122 项）
   Core/
     AX.swift                      Accessibility API 封装
     Models.swift                  Layout / WindowSnapshot / Frame / HotKeySpec

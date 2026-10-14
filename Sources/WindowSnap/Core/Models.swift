@@ -61,6 +61,8 @@ struct WindowSnapshot: Codable, Identifiable, Hashable {
     var frame: Frame
 
     var displayID: UInt32
+    /// 显示器稳定标识（EDID UUID）。displayID 重启后会重新分配，只能靠这个认屏。
+    var displayUUID: String?
     var displayIndex: Int
     var displayName: String
     /// 保存时该显示器的全局矩形
@@ -87,6 +89,7 @@ struct WindowSnapshot: Codable, Identifiable, Hashable {
          subrole: String,
          frame: Frame,
          displayID: UInt32,
+         displayUUID: String? = nil,
          displayIndex: Int,
          displayName: String,
          displayFrame: Frame,
@@ -105,6 +108,7 @@ struct WindowSnapshot: Codable, Identifiable, Hashable {
         self.subrole = subrole
         self.frame = frame
         self.displayID = displayID
+        self.displayUUID = displayUUID
         self.displayIndex = displayIndex
         self.displayName = displayName
         self.displayFrame = displayFrame
@@ -118,7 +122,7 @@ struct WindowSnapshot: Codable, Identifiable, Hashable {
 
     enum CodingKeys: String, CodingKey {
         case id, bundleID, appName, title, role, subrole
-        case frame, displayID, displayIndex, displayName, displayFrame, relativeFrame
+        case frame, displayID, displayUUID, displayIndex, displayName, displayFrame, relativeFrame
         case isMinimized, isFullScreen, zIndex, matchTitle, isEnabled
     }
 
@@ -134,6 +138,7 @@ struct WindowSnapshot: Codable, Identifiable, Hashable {
         subrole = try container.decodeIfPresent(String.self, forKey: .subrole) ?? ""
         frame = try container.decode(Frame.self, forKey: .frame)
         displayID = try container.decodeIfPresent(UInt32.self, forKey: .displayID) ?? 0
+        displayUUID = try container.decodeIfPresent(String.self, forKey: .displayUUID)
         displayIndex = try container.decodeIfPresent(Int.self, forKey: .displayIndex) ?? 0
         displayName = try container.decodeIfPresent(String.self, forKey: .displayName) ?? ""
         displayFrame = try container.decodeIfPresent(Frame.self, forKey: .displayFrame) ?? frame
@@ -177,6 +182,7 @@ struct WindowSnapshot: Codable, Identifiable, Hashable {
     mutating func syncDisplayInfo(displays: [DisplayInfo] = ScreenGeometry.currentDisplays) {
         guard let display = ScreenGeometry.display(containing: frame.cgRect, in: displays) else { return }
         displayID = display.id
+        displayUUID = display.uuid
         displayIndex = display.index
         displayName = display.name
         displayFrame = Frame(display.frame)

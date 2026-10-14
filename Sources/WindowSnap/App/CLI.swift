@@ -28,6 +28,10 @@ enum CLI {
         case "--list":
             list()
             return true
+        case "--check-layout":
+            guard args.count >= 2 else { fail("用法：WindowSnap --check-layout \"布局名字\"") }
+            checkLayout(name: args[1])
+            return true
         case "--selftest":
             exit(SelfTest.run())
         case "--save":
@@ -64,6 +68,7 @@ enum CLI {
           --save-window 3 "名字" 只把扫描列表里第 3 个窗口存成布局
           --restore "名字"       恢复指定布局
           --list                列出已保存的布局
+          --check-layout "名字"  只计算恢复目标落在哪块屏上，不移动窗口
           --help                显示本帮助
 
         数据目录：\(LayoutStore.shared.directory.path)
@@ -127,6 +132,38 @@ enum CLI {
                          snapshot.subrole.isEmpty ? snapshot.role : snapshot.subrole,
                          frame.width, frame.height, frame.x, frame.y,
                          snapshot.displayName))
+        }
+    }
+
+    /// 不移动任何窗口，只算一遍「每条记录现在会被放到哪块屏幕上」。
+    /// 用来排查「窗口跑到别的显示器」这类问题。
+    private static func checkLayout(name: String) {
+        let store = LayoutStore.shared
+        guard let layout = store.layouts.first(where: { $0.name == name })
+                ?? store.layouts.first(where: { $0.id.uuidString.lowercased().hasPrefix(name.lowercased()) }) else {
+            fail("找不到布局「\(name)」，用 --list 看看有哪些")
+        }
+
+        let displays = ScreenGeometry.currentDisplays
+        print("布局「\(layout.displayName)」共 \(layout.windows.count) 个窗口")
+        print("当前显示器：" + displays.map { "\($0.name)(id=\($0.id))" }.joined(separator: "、"))
+        print("")
+
+        var mismatched = 0
+        for window in layout.windows {
+            let resolved = ScreenGeometry.resolveTarget(for: window, in: displays)
+            if resolved.display.name != window.displayName { mismatched += 1 }
+            let mark = resolved.display.name == window.displayName ? "  " : "->"
+            print("\(mark) [\(window.appName)] \(window.displayTitle)")
+            print("     保存时：\(window.displayName)  \(Int(window.frame.x)),\(Int(window.frame.y)) \(Int(window.frame.width))x\(Int(window.frame.height))")
+            print("     现在会：\(resolved.display.name)  \(Int(resolved.frame.origin.x)),\(Int(resolved.frame.origin.y)) \(Int(resolved.frame.width))x\(Int(resolved.frame.height))\(resolved.remapped ? "（按相对坐标重投影）" : "")")
+        }
+
+        print("")
+        if mismatched == 0 {
+            print("全部窗口都会回到保存时的那块屏幕")
+        } else {
+            print("有 \(mismatched) 个窗口会被放到与保存时不同的屏幕上（显示器换了，或识别失败）")
         }
     }
 
