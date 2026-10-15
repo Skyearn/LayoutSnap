@@ -57,7 +57,6 @@ struct ExcludedAppsView: View {
             Label("添加应用…", systemImage: "plus")
         }
         .frame(width: 130)
-        .help("从正在运行的应用里挑，或者直接去应用程序文件夹里选")
     }
 
     private func appRow(_ bundleID: String) -> some View {
@@ -79,7 +78,6 @@ struct ExcludedAppsView: View {
                 Image(systemName: "minus.circle")
             }
             .buttonStyle(.borderless)
-            .help("不再忽略这个应用")
         }
     }
 

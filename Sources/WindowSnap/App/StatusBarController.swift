@@ -50,7 +50,6 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         super.init()
 
         statusItem.button?.imagePosition = .imageLeading
-        statusItem.button?.toolTip = "WindowSnap · 窗口布局记忆"
 
         menu.delegate = self
         statusItem.menu = menu
@@ -108,7 +107,6 @@ final class StatusBarController: NSObject, NSMenuDelegate {
             let item = NSMenuItem(title: title(for: layout), action: #selector(restoreLayout(_:)), keyEquivalent: "")
             item.target = self
             item.representedObject = layout.id.uuidString
-            item.toolTip = layout.appSummary
             applyHotKey(layout.hotKey, to: item)
             if controller.isRestoring { item.isEnabled = false }
             restoreMenu.addItem(item)
@@ -202,7 +200,6 @@ final class StatusBarController: NSObject, NSMenuDelegate {
             let item = NSMenuItem(title: layout.displayName, action: intoAction, keyEquivalent: "")
             item.target = self
             item.representedObject = layout.id.uuidString
-            item.toolTip = "覆盖「\(layout.displayName)」（原本有 \(layout.windows.count) 个窗口）"
             submenu.addItem(item)
         }
         submenu.addItem(.separator())
@@ -299,9 +296,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         guard let button = statusItem.button else { return }
         button.image = image
         button.title = ""
-        // 注意：toolTip 只在 init 里设一次，这里绝对不要动它。
-        // 状态一变就改 toolTip 的话，AppKit 会跟着重新弹一次提示框，
-        // 扫描 / 恢复期间状态一直在变，那个框就会一直挂在那儿不消失。
+        // 不使用 toolTip：任何悬停提示都属于悬浮文字，本项目一律不显示
     }
 
     // MARK: - 动作

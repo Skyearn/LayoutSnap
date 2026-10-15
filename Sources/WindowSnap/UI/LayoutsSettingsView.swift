@@ -245,7 +245,7 @@ struct LayoutDetailView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 10) {
                 if layout.windows.isEmpty == false {
-                    enabledCheckbox(layout.windows, help: "全部窗口是否参与恢复")
+                    enabledCheckbox(layout.windows)
                 }
                 Text("包含的窗口（\(layout.windows.count)）").font(.headline)
                 if disabledCount > 0 {
@@ -288,7 +288,7 @@ struct LayoutDetailView: View {
                 }
                 .buttonStyle(.borderless)
 
-                enabledCheckbox(group.windows, help: "这个应用的窗口是否参与恢复")
+                enabledCheckbox(group.windows)
                 Image(nsImage: IconCache.icon(for: group.bundleID))
                     .resizable()
                     .frame(width: 16, height: 16)
@@ -323,7 +323,6 @@ struct LayoutDetailView: View {
             }
             .toggleStyle(.checkbox)
             .labelsHidden()
-            .help("取消勾选 = 这条记录留着，但恢复时不动它")
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(snapshot.displayTitle).lineLimit(1)
@@ -340,7 +339,6 @@ struct LayoutDetailView: View {
             } label: {
                 Image(systemName: "arrow.uturn.backward")
             }
-            .help("只把这一个窗口移回原位")
             .buttonStyle(.borderless)
             .disabled(controller.isRestoring)
 
@@ -349,7 +347,6 @@ struct LayoutDetailView: View {
             } label: {
                 Image(systemName: "arrow.triangle.2.circlepath")
             }
-            .help("把窗口现在的位置和尺寸同步到这条记录")
             .buttonStyle(.borderless)
 
             Button {
@@ -357,7 +354,6 @@ struct LayoutDetailView: View {
             } label: {
                 Image(systemName: "pencil")
             }
-            .help("编辑坐标、尺寸、匹配关键词")
             .buttonStyle(.borderless)
 
             Button {
@@ -365,7 +361,6 @@ struct LayoutDetailView: View {
             } label: {
                 Image(systemName: "arrow.up")
             }
-            .help("往前放（恢复时叠放更靠前）")
             .buttonStyle(.borderless)
 
             Button {
@@ -373,7 +368,6 @@ struct LayoutDetailView: View {
             } label: {
                 Image(systemName: "arrow.down")
             }
-            .help("往后放")
             .buttonStyle(.borderless)
 
             Button {
@@ -381,7 +375,6 @@ struct LayoutDetailView: View {
             } label: {
                 Image(systemName: "trash")
             }
-            .help("从这个布局里删掉（不会关闭窗口）")
             .buttonStyle(.borderless)
         }
         .padding(.vertical, 2)
@@ -392,7 +385,7 @@ struct LayoutDetailView: View {
     /// 三态复选框：全开 / 全关 / 部分开。
     /// 点和「每行的小勾选框」是同一个操作，只是作用于整组，避免出现两套重复的开关。
     @ViewBuilder
-    private func enabledCheckbox(_ windows: [WindowSnapshot], help: String) -> some View {
+    private func enabledCheckbox(_ windows: [WindowSnapshot]) -> some View {
         let enabledCount = windows.filter { $0.isEnabled }.count
         let allOn = windows.isEmpty == false && enabledCount == windows.count
         let allOff = enabledCount == 0
@@ -403,7 +396,6 @@ struct LayoutDetailView: View {
                 .foregroundStyle(allOn ? Color.accentColor : Color.secondary)
         }
         .buttonStyle(.borderless)
-        .help(help)
     }
 
     private func deleteApp(_ group: (bundleID: String, appName: String, windows: [WindowSnapshot])) {

@@ -109,8 +109,6 @@ struct HotKeyRow: View {
             }
             .buttonStyle(.bordered)
             .tint(recorder.isRecording ? Color.accentColor : nil)
-            // 文案固定：跟着状态变的 tooltip 会让系统反复弹框，容易赖着不走
-            .help("点一下再按组合键；Esc 取消，Delete 清除")
 
             Button {
                 onChange(nil)
@@ -119,7 +117,6 @@ struct HotKeyRow: View {
             }
             .buttonStyle(.borderless)
             .disabled(spec == nil)
-            .help("清除快捷键")
         }
         .padding(.vertical, 2)
         .onAppear {
