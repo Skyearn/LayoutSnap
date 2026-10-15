@@ -340,6 +340,7 @@ struct LayoutDetailView: View {
                 Image(systemName: "arrow.uturn.backward")
             }
             .buttonStyle(.borderless)
+            .help("只把这一个窗口移回原位")
             .disabled(controller.isRestoring)
 
             Button {
@@ -348,6 +349,7 @@ struct LayoutDetailView: View {
                 Image(systemName: "arrow.triangle.2.circlepath")
             }
             .buttonStyle(.borderless)
+            .help("把窗口现在的位置和尺寸同步到这条记录")
 
             Button {
                 controller.editWindow(snapshot, in: layout)
@@ -355,6 +357,7 @@ struct LayoutDetailView: View {
                 Image(systemName: "pencil")
             }
             .buttonStyle(.borderless)
+            .help("编辑坐标、尺寸、匹配关键词")
 
             Button {
                 store.moveWindow(id: snapshot.id, direction: -1, in: layout.id)
@@ -362,6 +365,7 @@ struct LayoutDetailView: View {
                 Image(systemName: "arrow.up")
             }
             .buttonStyle(.borderless)
+            .help("往前放（恢复时叠放更靠前）")
 
             Button {
                 store.moveWindow(id: snapshot.id, direction: 1, in: layout.id)
@@ -369,6 +373,7 @@ struct LayoutDetailView: View {
                 Image(systemName: "arrow.down")
             }
             .buttonStyle(.borderless)
+            .help("往后放")
 
             Button {
                 store.removeWindows(ids: Set<UUID>([snapshot.id]), from: layout.id)
@@ -376,6 +381,7 @@ struct LayoutDetailView: View {
                 Image(systemName: "trash")
             }
             .buttonStyle(.borderless)
+            .help("从这个布局里删掉（不会关闭窗口）")
         }
         .padding(.vertical, 2)
         .padding(.leading, 18)

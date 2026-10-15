@@ -78,6 +78,7 @@ struct ExcludedAppsView: View {
                 Image(systemName: "minus.circle")
             }
             .buttonStyle(.borderless)
+            .help("不再忽略这个应用")
         }
     }
 

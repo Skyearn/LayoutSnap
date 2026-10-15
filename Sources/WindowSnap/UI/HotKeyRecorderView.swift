@@ -116,6 +116,7 @@ struct HotKeyRow: View {
                 Image(systemName: "xmark.circle")
             }
             .buttonStyle(.borderless)
+            .help("清除快捷键")
             .disabled(spec == nil)
         }
         .padding(.vertical, 2)
