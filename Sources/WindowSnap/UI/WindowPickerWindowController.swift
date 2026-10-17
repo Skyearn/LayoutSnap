@@ -5,6 +5,7 @@ import SwiftUI
 enum WindowPickerPurpose {
     case createNew(name: String)
     case append(layout: Layout)
+    case replace(layout: Layout)
 
     var summary: String {
         switch self {
@@ -12,6 +13,8 @@ enum WindowPickerPurpose {
             return "存成新布局「\(name)」"
         case .append(let layout):
             return "加入「\(layout.displayName)」（原本 \(layout.windows.count) 个）"
+        case .replace(let layout):
+            return "覆盖「\(layout.displayName)」（原本 \(layout.windows.count) 个）"
         }
     }
 
@@ -19,7 +22,7 @@ enum WindowPickerPurpose {
     var existingLayout: Layout? {
         switch self {
         case .createNew: return nil
-        case .append(let layout): return layout
+        case .append(let layout), .replace(let layout): return layout
         }
     }
 }
@@ -221,6 +224,8 @@ struct WindowPickerView: View {
             return "保存为「\(name)」"
         case .append(let layout):
             return "加入「\(layout.displayName)」"
+        case .replace(let layout):
+            return "覆盖「\(layout.displayName)」"
         }
     }
 }

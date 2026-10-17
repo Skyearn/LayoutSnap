@@ -340,13 +340,19 @@ enum SelfTest {
         check(HotKeySpec.defaultRestore.carbonModifiers == HotKeySpec.control, "默认快捷键带 ⌃")
         check(HotKeySpec.defaultRestore.keyEquivalent == "z", "默认快捷键能在菜单里显示成 z")
 
-        check(AppAction.allCases.count == 4, "一共四个全局动作")
+        check(AppAction.allCases.count == 5, "一共五个全局动作")
         let withDefault = AppAction.allCases.filter { $0.defaultHotKey != nil }
         check(withDefault.count == 1, "只有「恢复布局」有默认快捷键")
         check(withDefault.first == .restoreLayout, "带默认键的是恢复布局")
         check(AppAction.saveAllWindows.defaultHotKey == nil, "保存所有窗口默认不设快捷键")
         check(AppAction.savePartialWindows.defaultHotKey == nil, "保存部分窗口默认不设快捷键")
-        check(AppAction.saveCurrentWindow.defaultHotKey == nil, "保存当前窗口默认不设快捷键")
+        check(AppAction.addCurrentWindow.defaultHotKey == nil, "添加当前窗口默认不设快捷键")
+        check(AppAction.addPartialWindows.defaultHotKey == nil, "添加部分窗口默认不设快捷键")
+
+        check(AppAction.addCurrentWindow.isAppend, "「添加当前窗口」是追加语义")
+        check(AppAction.addPartialWindows.isAppend, "「添加部分窗口」是追加语义")
+        check(AppAction.savePartialWindows.isAppend == false, "「保存部分窗口」是覆盖语义")
+        check(AppAction.saveAllWindows.isAppend == false, "「保存所有窗口」是覆盖语义")
 
         let allFlags: NSEvent.ModifierFlags = [.control, .option, .shift, .command]
         let carbon = HotKeyKeys.carbonModifiers(from: allFlags)

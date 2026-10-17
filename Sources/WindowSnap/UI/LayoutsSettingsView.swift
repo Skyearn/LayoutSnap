@@ -55,6 +55,7 @@ struct LayoutsSettingsView: View {
                         .foregroundStyle(.secondary)
                     Button("添加当前窗口") { controller.saveCurrentWindowLayout() }
                     Button("添加部分窗口") { controller.savePartialWindowsLayout() }
+                    Button("保存部分窗口") { controller.replacePartialWindowsLayout() }
                     Button("保存所有窗口") { controller.saveAllWindowsLayout() }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -91,7 +92,7 @@ struct LayoutsSettingsView: View {
                     Menu("添加当前窗口") {
                         ForEach(store.layouts) { layout in
                             Button("添加到「\(layout.displayName)」") {
-                                controller.saveCurrentWindow(into: layout)
+                                controller.appendCurrentWindow(to: layout)
                             }
                         }
                         if store.layouts.isEmpty == false { Divider() }
@@ -100,16 +101,25 @@ struct LayoutsSettingsView: View {
                     Menu("添加部分窗口") {
                         ForEach(store.layouts) { layout in
                             Button("添加到「\(layout.displayName)」") {
-                                controller.savePartialWindows(into: layout)
+                                controller.appendPartialWindows(to: layout)
                             }
                         }
                         if store.layouts.isEmpty == false { Divider() }
                         Button("新建布局…") { controller.savePartialWindowsLayout() }
                     }
+                    Menu("保存部分窗口") {
+                        ForEach(store.layouts) { layout in
+                            Button("覆盖「\(layout.displayName)」") {
+                                controller.replacePartialWindows(in: layout)
+                            }
+                        }
+                        if store.layouts.isEmpty == false { Divider() }
+                        Button("新建布局…") { controller.replacePartialWindowsLayout() }
+                    }
                     Menu("保存所有窗口") {
                         ForEach(store.layouts) { layout in
                             Button("覆盖「\(layout.displayName)」") {
-                                controller.saveAllWindows(into: layout)
+                                controller.replaceAllWindows(in: layout)
                             }
                         }
                         if store.layouts.isEmpty == false { Divider() }

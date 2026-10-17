@@ -130,7 +130,7 @@ final class AppController: ObservableObject {
     /// 快捷键「添加当前窗口」：加到最近使用的布局；还没有可用布局时新建一个
     private func addCurrentWindowToRecentLayout() {
         if let layout = lastUsedLayout {
-            saveCurrentWindow(into: layout)
+            appendCurrentWindow(to: layout)
         } else {
             saveCurrentWindowLayout()
         }
@@ -139,9 +139,18 @@ final class AppController: ObservableObject {
     /// 快捷键「添加部分窗口」：同上，挑好窗口后加到最近使用的布局
     private func addPartialWindowsToRecentLayout() {
         if let layout = lastUsedLayout {
-            savePartialWindows(into: layout)
+            appendPartialWindows(to: layout)
         } else {
             savePartialWindowsLayout()
+        }
+    }
+
+    /// 快捷键「保存部分窗口」：挑好窗口后整体覆盖最近使用的布局
+    private func replacePartialWindowsInRecentLayout() {
+        if let layout = lastUsedLayout {
+            replacePartialWindows(in: layout)
+        } else {
+            replacePartialWindowsLayout()
         }
     }
 
@@ -188,10 +197,12 @@ final class AppController: ObservableObject {
         switch action {
         case .restoreLayout:
             restoreLastUsedLayout()
-        case .saveCurrentWindow:
+        case .addCurrentWindow:
             addCurrentWindowToRecentLayout()
-        case .savePartialWindows:
+        case .addPartialWindows:
             addPartialWindowsToRecentLayout()
+        case .savePartialWindows:
+            replacePartialWindowsInRecentLayout()
         case .saveAllWindows:
             saveAllWindowsLayout()
         }
@@ -290,7 +301,7 @@ final class AppController: ObservableObject {
         }
     }
 
-    /// 保存部分窗口：先给新布局起名字，再打开选择器挑窗口
+    /// 新建一个由勾选窗口组成的布局（「添加部分窗口」「保存部分窗口」的新建流程相同）
     func savePartialWindowsLayout() {
         guard requirePermission() else { return }
         let defaultName = "布局 \(store.layouts.count + 1)"
@@ -301,10 +312,15 @@ final class AppController: ObservableObject {
         openWindowPicker(purpose: .createNew(name: name))
     }
 
-    // MARK: - 保存进已有布局（覆盖）
+    /// 「保存部分窗口」的新建流程：同样先起名再挑窗口
+    func replacePartialWindowsLayout() {
+        savePartialWindowsLayout()
+    }
 
-    /// 把当前窗口存进指定布局，覆盖它原来的内容
-    func saveCurrentWindow(into layout: Layout) {
+    // MARK: - 添加到已有布局（追加）
+
+    /// 把当前窗口加到指定布局里，布局中其他窗口记录保持不动
+    func appendCurrentWindow(to layout: Layout) {
         guard requirePermission() else { return }
         statusBar?.showBusy("正在读取当前窗口…")
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
@@ -326,8 +342,10 @@ final class AppController: ObservableObject {
         }
     }
 
-    /// 把所有窗口存进指定布局，覆盖它原来的内容
-    func saveAllWindows(into layout: Layout) {
+    // MARK: - 保存进已有布局（整体覆盖）
+
+    /// 用当前所有窗口整体覆盖指定布局
+    func replaceAllWindows(in layout: Layout) {
         guard requirePermission() else { return }
         scanCurrentWindows { [weak self] snapshots in
             guard let self else { return }
@@ -343,9 +361,14 @@ final class AppController: ObservableObject {
         }
     }
 
-    /// 把挑出来的窗口添加到指定布局（追加，不动布局里原有的窗口）
-    func savePartialWindows(into layout: Layout) {
+    /// 勾选窗口后加到指定布局里（追加）
+    func appendPartialWindows(to layout: Layout) {
         openWindowPicker(purpose: .append(layout: layout))
+    }
+
+    /// 勾选窗口后整体覆盖指定布局
+    func replacePartialWindows(in layout: Layout) {
+        openWindowPicker(purpose: .replace(layout: layout))
     }
 
     /// 选择器里点了确认：按当初的意图落到对应的布局上
@@ -358,6 +381,10 @@ final class AppController: ObservableObject {
         case .append(let layout):
             addWindows(snapshots, to: layout)
             settings.lastUsedLayoutID = layout.id.uuidString
+        case .replace(let layout):
+            store.replaceWindows(snapshots, in: layout.id)
+            settings.lastUsedLayoutID = layout.id.uuidString
+            statusBar?.flash("已用 \(snapshots.count) 个窗口覆盖「\(layout.displayName)」")
         }
     }
 

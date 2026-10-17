@@ -77,6 +77,22 @@ final class AppSettings: ObservableObject {
         persistActionHotKeys()
     }
 
+    /// 1.0.3 之前「保存当前窗口 / 保存部分窗口」的键名，
+    /// 现在分别对应「添加当前窗口 / 添加部分窗口」，读配置时迁移过来
+    private static func migrateActionKeys(_ stored: [String: HotKeySpec]) -> [String: HotKeySpec] {
+        var migrated: [String: HotKeySpec] = [:]
+        for (key, spec) in stored {
+            let newKey: String
+            switch key {
+            case "saveCurrentWindow": newKey = "addCurrentWindow"
+            case "savePartialWindows": newKey = "addPartialWindows"
+            default: newKey = key
+            }
+            migrated[newKey] = spec
+        }
+        return migrated
+    }
+
     private func persistActionHotKeys() {
         if let data = try? JSONEncoder().encode(actionHotKeys) {
             defaults.set(data, forKey: "actionHotKeys")
@@ -139,7 +155,7 @@ final class AppSettings: ObservableObject {
 
         if let data = defaults.data(forKey: "actionHotKeys"),
            let decoded = try? JSONDecoder().decode([String: HotKeySpec].self, from: data) {
-            actionHotKeys = decoded
+            actionHotKeys = AppSettings.migrateActionKeys(decoded)
         } else {
             // 第一次运行：只给「恢复布局」放上 ⌃Z
             var seeds: [String: HotKeySpec] = [:]

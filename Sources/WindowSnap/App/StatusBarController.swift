@@ -116,29 +116,38 @@ final class StatusBarController: NSObject, NSMenuDelegate {
 
         menu.addItem(.separator())
 
-        // ---- 三个保存动作
-        let saveCurrent = NSMenuItem(title: "添加当前窗口", action: nil, keyEquivalent: "")
-        saveCurrent.submenu = makeSaveMenu(newTitle: "新建布局…",
-                                          newAction: #selector(saveCurrentWindowNew),
-                                          intoAction: #selector(saveCurrentWindowInto(_:)),
+        // ---- 四个保存动作：添加 = 追加，保存 = 覆盖
+        let addCurrent = NSMenuItem(title: "添加当前窗口", action: nil, keyEquivalent: "")
+        addCurrent.submenu = makeSaveMenu(newTitle: "新建布局…",
+                                          newAction: #selector(addCurrentWindowNew),
+                                          intoAction: #selector(addCurrentWindowInto(_:)),
                                           itemVerb: "添加到",
-                                          hotKey: settings.hotKey(for: .saveCurrentWindow))
-        saveCurrent.isEnabled = controller.isRestoring == false
-        menu.addItem(saveCurrent)
+                                          hotKey: settings.hotKey(for: .addCurrentWindow))
+        addCurrent.isEnabled = controller.isRestoring == false
+        menu.addItem(addCurrent)
 
-        let savePartial = NSMenuItem(title: "添加部分窗口", action: nil, keyEquivalent: "")
-        savePartial.submenu = makeSaveMenu(newTitle: "新建布局…",
-                                          newAction: #selector(savePartialNew),
-                                          intoAction: #selector(savePartialInto(_:)),
+        let addPartial = NSMenuItem(title: "添加部分窗口", action: nil, keyEquivalent: "")
+        addPartial.submenu = makeSaveMenu(newTitle: "新建布局…",
+                                          newAction: #selector(addPartialWindowsNew),
+                                          intoAction: #selector(addPartialWindowsInto(_:)),
                                           itemVerb: "添加到",
-                                          hotKey: settings.hotKey(for: .savePartialWindows))
+                                          hotKey: settings.hotKey(for: .addPartialWindows))
+        addPartial.isEnabled = controller.isRestoring == false
+        menu.addItem(addPartial)
+
+        let savePartial = NSMenuItem(title: "保存部分窗口", action: nil, keyEquivalent: "")
+        savePartial.submenu = makeSaveMenu(newTitle: "新建布局…",
+                                           newAction: #selector(savePartialWindowsNew),
+                                           intoAction: #selector(savePartialWindowsInto(_:)),
+                                           itemVerb: "覆盖",
+                                           hotKey: settings.hotKey(for: .savePartialWindows))
         savePartial.isEnabled = controller.isRestoring == false
         menu.addItem(savePartial)
 
         let saveAll = NSMenuItem(title: "保存所有窗口", action: nil, keyEquivalent: "")
         saveAll.submenu = makeSaveMenu(newTitle: "新建布局…",
-                                      newAction: #selector(saveAllNew),
-                                      intoAction: #selector(saveAllInto(_:)),
+                                      newAction: #selector(saveAllWindowsNew),
+                                      intoAction: #selector(saveAllWindowsInto(_:)),
                                       itemVerb: "覆盖",
                                       hotKey: settings.hotKey(for: .saveAllWindows))
         saveAll.isEnabled = controller.isRestoring == false
@@ -335,31 +344,40 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         controller?.restoreLastUsedLayout()
     }
 
-    @objc private func saveCurrentWindowNew() {
+    @objc private func addCurrentWindowNew() {
         controller?.saveCurrentWindowLayout()
     }
 
-    @objc private func savePartialNew() {
+    @objc private func addPartialWindowsNew() {
         controller?.savePartialWindowsLayout()
     }
 
-    @objc private func saveAllNew() {
+    @objc private func savePartialWindowsNew() {
+        controller?.replacePartialWindowsLayout()
+    }
+
+    @objc private func saveAllWindowsNew() {
         controller?.saveAllWindowsLayout()
     }
 
-    @objc private func saveCurrentWindowInto(_ sender: NSMenuItem) {
+    @objc private func addCurrentWindowInto(_ sender: NSMenuItem) {
         guard let layout = layout(from: sender) else { return }
-        controller?.saveCurrentWindow(into: layout)
+        controller?.appendCurrentWindow(to: layout)
     }
 
-    @objc private func savePartialInto(_ sender: NSMenuItem) {
+    @objc private func addPartialWindowsInto(_ sender: NSMenuItem) {
         guard let layout = layout(from: sender) else { return }
-        controller?.savePartialWindows(into: layout)
+        controller?.appendPartialWindows(to: layout)
     }
 
-    @objc private func saveAllInto(_ sender: NSMenuItem) {
+    @objc private func savePartialWindowsInto(_ sender: NSMenuItem) {
         guard let layout = layout(from: sender) else { return }
-        controller?.saveAllWindows(into: layout)
+        controller?.replacePartialWindows(in: layout)
+    }
+
+    @objc private func saveAllWindowsInto(_ sender: NSMenuItem) {
+        guard let layout = layout(from: sender) else { return }
+        controller?.replaceAllWindows(in: layout)
     }
 
     @objc private func openSettings() {
