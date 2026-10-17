@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-/// 布局的持久化存储：~/Library/Application Support/WindowSnap/layouts.json
+/// 布局的持久化存储：~/Library/Application Support/LayoutSnap/layouts.json
 final class LayoutStore: ObservableObject {
 
     static let shared = LayoutStore()
@@ -9,7 +9,7 @@ final class LayoutStore: ObservableObject {
     @Published private(set) var layouts: [Layout] = []
 
     private let fileManager = FileManager.default
-    private let queue = DispatchQueue(label: "com.windowsnap.store")
+    private let queue = DispatchQueue(label: "com.layoutsnap.store")
 
     let directory: URL
     let fileURL: URL
@@ -49,9 +49,9 @@ final class LayoutStore: ObservableObject {
             candidates.append(URL(fileURLWithPath: (custom as NSString).expandingTildeInPath, isDirectory: true))
         }
         if let base = manager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
-            candidates.append(base.appendingPathComponent("WindowSnap", isDirectory: true))
+            candidates.append(base.appendingPathComponent("LayoutSnap", isDirectory: true))
         }
-        candidates.append(URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent(".windowsnap", isDirectory: true))
+        candidates.append(URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent(".layoutsnap", isDirectory: true))
 
         for candidate in candidates {
             do {
@@ -59,6 +59,7 @@ final class LayoutStore: ObservableObject {
                 let probe = candidate.appendingPathComponent(".write-probe")
                 try Data("ok".utf8).write(to: probe)
                 try? manager.removeItem(at: probe)
+                migrateLegacyDataIfNeeded(into: candidate)
                 return candidate
             } catch {
                 Log.error("数据目录不可用 \(candidate.path)：\(error.localizedDescription)")
@@ -66,6 +67,26 @@ final class LayoutStore: ObservableObject {
         }
         Log.error("找不到可写的数据目录，布局将无法保存")
         return candidates.first ?? URL(fileURLWithPath: NSHomeDirectory())
+    }
+
+    /// 老版本应用叫 WindowSnap，目录名跟着是 WindowSnap。
+    /// 改名后第一次启动时把布局文件搬过来，避免用户丢数据。
+    private static func migrateLegacyDataIfNeeded(into directory: URL) {
+        let manager = FileManager.default
+        let newFile = directory.appendingPathComponent("layouts.json")
+        guard manager.fileExists(atPath: newFile.path) == false else { return }
+
+        let legacyDirectory = directory.deletingLastPathComponent()
+            .appendingPathComponent("WindowSnap", isDirectory: true)
+        let legacyFile = legacyDirectory.appendingPathComponent("layouts.json")
+        guard manager.fileExists(atPath: legacyFile.path) else { return }
+
+        do {
+            try manager.copyItem(at: legacyFile, to: newFile)
+            Log.info("已从旧目录迁移布局数据：\(legacyDirectory.path)")
+        } catch {
+            Log.error("迁移旧布局数据失败：\(error.localizedDescription)")
+        }
     }
 
     // MARK: - 读写

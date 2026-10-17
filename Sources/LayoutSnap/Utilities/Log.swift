@@ -2,18 +2,18 @@ import Foundation
 
 /// 极简日志：写文件 + 输出到 stderr（用 `log stream` 或 Console.app 也能看到）
 enum Log {
-    private static let queue = DispatchQueue(label: "com.windowsnap.log")
+    private static let queue = DispatchQueue(label: "com.layoutsnap.log")
     private static let fm = FileManager.default
 
     static let directory: URL = {
         let base = fm.urls(for: .libraryDirectory, in: .userDomainMask).first
             ?? URL(fileURLWithPath: NSHomeDirectory() + "/Library")
-        let dir = base.appendingPathComponent("Logs/WindowSnap", isDirectory: true)
+        let dir = base.appendingPathComponent("Logs/LayoutSnap", isDirectory: true)
         try? fm.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir
     }()
 
-    static let fileURL: URL = directory.appendingPathComponent("WindowSnap.log")
+    static let fileURL: URL = directory.appendingPathComponent("LayoutSnap.log")
 
     private static let formatter: DateFormatter = {
         let f = DateFormatter()
@@ -42,7 +42,7 @@ enum Log {
     static func rotateIfNeeded(maxBytes: Int = 2_000_000) {
         guard let attrs = try? fm.attributesOfItem(atPath: fileURL.path),
               let size = attrs[.size] as? Int, size > maxBytes else { return }
-        let backup = directory.appendingPathComponent("WindowSnap.log.1")
+        let backup = directory.appendingPathComponent("LayoutSnap.log.1")
         try? fm.removeItem(at: backup)
         try? fm.moveItem(at: fileURL, to: backup)
     }

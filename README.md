@@ -1,13 +1,13 @@
 <div align="center">
 
-<img src="docs/icon.png" width="112" alt="WindowSnap">
+<img src="docs/icon.png" width="112" alt="LayoutSnap 布局快照">
 
-# WindowSnap
+# LayoutSnap 布局快照
 
 macOS 窗口布局管理与恢复工具
 
-[![CI](https://github.com/Skyearn/WindowSnap/actions/workflows/ci.yml/badge.svg)](https://github.com/Skyearn/WindowSnap/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/Skyearn/WindowSnap)](https://github.com/Skyearn/WindowSnap/releases)
+[![CI](https://github.com/Skyearn/LayoutSnap/actions/workflows/ci.yml/badge.svg)](https://github.com/Skyearn/LayoutSnap/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Skyearn/LayoutSnap)](https://github.com/Skyearn/LayoutSnap/releases)
 [![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-blue)](https://www.apple.com/macos/)
 [![Swift](https://img.shields.io/badge/Swift-5.9-orange)](https://swift.org)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
@@ -18,7 +18,7 @@ macOS 窗口布局管理与恢复工具
 
 ## 概述
 
-WindowSnap 是一个常驻菜单栏的 macOS 工具，用于保存与恢复窗口布局。
+LayoutSnap（中文名：布局快照）是一个常驻菜单栏的 macOS 工具，用于保存与恢复窗口布局。
 
 它在某一时刻扫描系统中所有普通应用的窗口，记录每个窗口的位置、尺寸、
 所在显示器、最小化状态以及窗口之间的前后叠放顺序，将其保存为一个「布局」。
@@ -53,32 +53,32 @@ WindowSnap 是一个常驻菜单栏的 macOS 工具，用于保存与恢复窗�
 
 ### 下载安装（推荐）
 
-1. 从 [Releases](https://github.com/Skyearn/WindowSnap/releases) 下载 `WindowSnap-x.y.z.dmg`
-2. 打开磁盘映像，将 WindowSnap 拖入「应用程序」文件夹
-3. 首次启动时，在「应用程序」中右键点击 WindowSnap，选择「打开」
+1. 从 [Releases](https://github.com/Skyearn/LayoutSnap/releases) 下载 `LayoutSnap-x.y.z.dmg`
+2. 打开磁盘映像，将 LayoutSnap 拖入「应用程序」文件夹
+3. 首次启动时，在「应用程序」中右键点击 LayoutSnap，选择「打开」
 
    若双击后被系统拦截，也可在终端执行一次：
 
    ```bash
-   xattr -dr com.apple.quarantine /Applications/WindowSnap.app
+   xattr -dr com.apple.quarantine /Applications/LayoutSnap.app
    ```
 
    > 原因是本项目未使用 Apple 开发者账号进行公证（需年费）。代码完全公开，
    > 也可按下一节自行构建。
 
-4. 授权辅助功能权限：系统设置 → 隐私与安全性 → 辅助功能 → 勾选 WindowSnap
-   （若列表中不存在，点击 `+` 添加 `/Applications/WindowSnap.app`）
-5. 授权后需**重启 WindowSnap** 才会生效
+4. 授权辅助功能权限：系统设置 → 隐私与安全性 → 辅助功能 → 勾选 LayoutSnap
+   （若列表中不存在，点击 `+` 添加 `/Applications/LayoutSnap.app`）
+5. 授权后需**重启 LayoutSnap** 才会生效
 
 ### 从源码构建
 
 要求 Xcode 15 及以上、macOS 13 及以上：
 
 ```bash
-git clone https://github.com/Skyearn/WindowSnap.git
-cd WindowSnap
+git clone https://github.com/Skyearn/LayoutSnap.git
+cd LayoutSnap
 
-# 编译并打包为 build/WindowSnap.app
+# 编译并打包为 build/LayoutSnap.app
 ./scripts/build.sh
 
 # 安装到「应用程序」（开机自启需要固定路径）
@@ -173,7 +173,7 @@ cd WindowSnap
 设置…                          ⌘,
 打开日志文件夹
 ────────────────────────
-退出 WindowSnap                ⌘Q
+退出 LayoutSnap                ⌘Q
 ```
 
 > **快捷键的显示位置**：带展开箭头的父项在 macOS 上不显示快捷键，
@@ -221,7 +221,7 @@ cd WindowSnap
 操作结果不写入菜单，也不做悬停提示，而是记录到日志：
 
 ```bash
-tail -f ~/Library/Logs/WindowSnap/WindowSnap.log
+tail -f ~/Library/Logs/LayoutSnap/LayoutSnap.log
 # [10-08 12:17:07] [info] 开始恢复「默认」，共 7 个窗口
 # [10-08 12:17:11] [info] 状态：已恢复 7 个窗口
 # [10-08 12:17:11] [info] 恢复完成：已恢复 7 个窗口，耗时 3.4s
@@ -235,7 +235,7 @@ tail -f ~/Library/Logs/WindowSnap/WindowSnap.log
 ## 命令行
 
 ```bash
-APP=/Applications/WindowSnap.app/Contents/MacOS/WindowSnap
+APP=/Applications/LayoutSnap.app/Contents/MacOS/LayoutSnap
 
 $APP --doctor              # 检查权限、显示器、功能快捷键与已保存的布局
 $APP --check-layout "工作"  # 只计算每条记录会落到哪块屏上，不移动任何窗口
@@ -304,8 +304,8 @@ $APP --selftest            # 运行内置自检（127 项断言）
 ## 数据文件
 
 ```
-~/Library/Application Support/WindowSnap/layouts.json   布局
-~/Library/Logs/WindowSnap/WindowSnap.log                日志
+~/Library/Application Support/LayoutSnap/layouts.json   布局
+~/Library/Logs/LayoutSnap/LayoutSnap.log                日志
 ```
 
 `layouts.json` 为可读格式，可直接编辑或通过导入导出功能备份。
@@ -343,12 +343,12 @@ Chromium／Electron 系应用（Chrome、VS Code、Slack 等）需在设置中�
 
 **需要查看恢复过程的详细信息**
 
-菜单 →「打开日志文件夹」，`WindowSnap.log` 中记录了每一步的执行细节。
+菜单 →「打开日志文件夹」，`LayoutSnap.log` 中记录了每一步的执行细节。
 
 ## 已知限制
 
 - **窗口无法跨「调度中心」空间移动**。macOS 未提供公开 API 可将窗口移动到其他 Space
-  （yabai 等工具使用私有接口并需关闭 SIP）。WindowSnap 仅恢复位置与尺寸，
+  （yabai 等工具使用私有接口并需关闭 SIP）。LayoutSnap 仅恢复位置与尺寸，
   窗口保留在其原有 Space 中。
 - 保存时处于**全屏**的窗口默认不做处理，避免影响正在全屏使用的窗口
   （可在设置中改为同样切换到全屏）。
@@ -362,7 +362,7 @@ Chromium／Electron 系应用（Chrome、VS Code、Slack 等）需在设置中�
 Package.swift                     SwiftPM 清单（Xcode 中直接打开此文件）
 Resources/Info.plist              LSUIElement=true，菜单栏应用，无 Dock 图标
 Resources/AppIcon.icns            App 图标
-Sources/WindowSnap/
+Sources/LayoutSnap/
   main.swift                      入口：先判断是否为命令行模式，否则进入菜单栏模式
   App/
     AppDelegate.swift             生命周期与首次运行引导
@@ -372,7 +372,7 @@ Sources/WindowSnap/
     SelfTest.swift                不依赖权限的自检（127 项）
   Core/
     AX.swift                      Accessibility API 封装
-    Models.swift                  Layout / WindowSnapshot / Frame / HotKeySpec
+    Models.swift                  Layout / LayoutSnapshot / Frame / HotKeySpec
     WindowScanner.swift           扫描窗口并生成快照
     WindowMatcher.swift           快照与真实窗口的配对评分
     WindowRestorer.swift          恢复流程（兼容模式、叠放顺序、并行调度）
@@ -394,7 +394,7 @@ scripts/make_icon.swift          生成图标
 运行测试：
 
 ```bash
-swift build && ./build/WindowSnap.app/Contents/MacOS/WindowSnap --selftest
+swift build && ./build/LayoutSnap.app/Contents/MacOS/LayoutSnap --selftest
 ```
 
 ## 发布流程

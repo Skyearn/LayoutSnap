@@ -187,7 +187,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
 
         menu.addItem(.separator())
 
-        let quitItem = NSMenuItem(title: "退出 WindowSnap", action: #selector(quit), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: "退出 布局快照", action: #selector(quit), keyEquivalent: "q")
         quitItem.target = self
         menu.addItem(quitItem)
     }
@@ -303,8 +303,8 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     }
 
     private func applyIcon() {
-        let image = NSImage(systemSymbolName: state.symbolName, accessibilityDescription: "WindowSnap")
-            ?? NSImage(systemSymbolName: "rectangle.3.group", accessibilityDescription: "WindowSnap")
+        let image = NSImage(systemSymbolName: state.symbolName, accessibilityDescription: "LayoutSnap")
+            ?? NSImage(systemSymbolName: "rectangle.3.group", accessibilityDescription: "LayoutSnap")
         image?.isTemplate = true
         guard let button = statusItem.button else { return }
         button.image = image

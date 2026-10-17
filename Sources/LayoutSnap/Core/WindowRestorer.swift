@@ -24,7 +24,7 @@ final class WindowRestorer {
         static var `default`: Options { Options() }
     }
 
-    private let queue = DispatchQueue(label: "com.windowsnap.restore", qos: .userInitiated)
+    private let queue = DispatchQueue(label: "com.layoutsnap.restore", qos: .userInitiated)
 
     /// 上一次恢复后遗留的窗口，用于「撤销恢复」这类操作（暂时没用上，留个钩子）
     private(set) var lastAllocated: [AXUIElement] = []
@@ -78,7 +78,7 @@ final class WindowRestorer {
             let resultLock = NSLock()
             let semaphore = DispatchSemaphore(value: max(1, options.maxConcurrentApps))
             let waitGroup = DispatchGroup()
-            let workers = DispatchQueue(label: "com.windowsnap.restore.app", attributes: .concurrent)
+            let workers = DispatchQueue(label: "com.layoutsnap.restore.app", attributes: .concurrent)
 
             for entry in groups {
                 semaphore.wait()

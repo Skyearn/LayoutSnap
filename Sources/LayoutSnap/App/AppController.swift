@@ -221,7 +221,7 @@ final class AppController: ObservableObject {
         if AX.isTrusted { return true }
         let alert = NSAlert()
         alert.messageText = "需要「辅助功能」权限"
-        alert.informativeText = "WindowSnap 需要辅助功能权限才能读取和恢复窗口的位置与大小。\n\n请到「系统设置 › 隐私与安全性 › 辅助功能」里勾选 WindowSnap（添加之后需要重启本应用才生效）。"
+        alert.informativeText = "布局快照 需要辅助功能权限才能读取和恢复窗口的位置与大小。\n\n请到「系统设置 › 隐私与安全性 › 辅助功能」里勾选 布局快照（添加之后需要重启本应用才生效）。"
         alert.alertStyle = .warning
         alert.addButton(withTitle: "打开系统设置")
         alert.addButton(withTitle: "稍后再说")
@@ -261,7 +261,7 @@ final class AppController: ObservableObject {
             guard let self else { return }
             guard !snapshots.isEmpty else {
                 self.simpleAlert(title: "没有可保存的窗口",
-                                 message: "没有扫描到任何窗口。请确认 WindowSnap 已经拿到辅助功能权限，并且当前确实有打开的窗口。")
+                                 message: "没有扫描到任何窗口。请确认 布局快照 已经拿到辅助功能权限，并且当前确实有打开的窗口。")
                 return
             }
             let defaultName = "布局 \(self.store.layouts.count + 1)"

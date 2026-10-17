@@ -6,7 +6,7 @@ import ServiceManagement
 final class AppSettings: ObservableObject {
 
     static let shared = AppSettings()
-    static let didChange = Notification.Name("com.windowsnap.settingsChanged")
+    static let didChange = Notification.Name("com.layoutsnap.settingsChanged")
 
     private let defaults: UserDefaults
     private var loading = true
@@ -120,7 +120,29 @@ final class AppSettings: ObservableObject {
     // MARK: - 生命周期
 
     private convenience init() {
+        AppSettings.migrateLegacyDefaultsIfNeeded(into: .standard)
         self.init(defaults: .standard)
+    }
+
+    /// 老版本的 bundle id 是 com.local.windowsnap，改名后新域是空的，
+    /// 这里把旧设置搬一次（只搬认识的键，避免带入无关数据）。
+    private static func migrateLegacyDefaultsIfNeeded(into defaults: UserDefaults) {
+        guard defaults.object(forKey: "hasShownWelcome") == nil else { return }
+        guard let legacy = UserDefaults(suiteName: "com.local.windowsnap") else { return }
+
+        let keys = ["launchAtLogin", "appLaunchTimeout", "compatibilityMode", "restoreStackingOrder",
+                    "restoreFullScreenWindows", "showResultInMenuBar", "parallelWorkers",
+                    "excludedBundleIDsText", "autoRestoreOnDisplayChange", "displayChangeLayoutID",
+                    "autoRestoreOnAppLaunch", "lastUsedLayoutID", "actionHotKeys", "hasShownWelcome"]
+        var migrated = 0
+        for key in keys {
+            guard let value = legacy.object(forKey: key) else { continue }
+            defaults.set(value, forKey: key)
+            migrated += 1
+        }
+        if migrated > 0 {
+            Log.info("已从旧版本迁移 \(migrated) 项设置")
+        }
     }
 
     /// 指定 UserDefaults 的实例（自检/测试用，免得动到用户真实设置）

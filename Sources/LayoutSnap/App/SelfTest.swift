@@ -3,7 +3,7 @@ import CoreGraphics
 import AppKit
 
 /// 不依赖辅助功能权限的自检：把最容易写错的几何换算和匹配算法跑一遍。
-/// 用法：WindowSnap --selftest
+/// 用法：LayoutSnap --selftest
 enum SelfTest {
 
     private static var passed = 0
@@ -120,7 +120,7 @@ enum SelfTest {
 
         group("布局存储")
 
-        let temp = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("windowsnap-selftest.json")
+        let temp = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("layoutsnap-selftest.json")
         do {
             try LayoutStore.shared.export(to: temp)
             let data = try Data(contentsOf: temp)
@@ -134,7 +134,7 @@ enum SelfTest {
         group("布局编辑：单个窗口粒度")
 
         let scratch = URL(fileURLWithPath: NSTemporaryDirectory())
-            .appendingPathComponent("windowsnap-selftest-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("layoutsnap-selftest-\(UUID().uuidString)", isDirectory: true)
         let tempStore = LayoutStore(directory: scratch)
 
         func makeSnapshot(_ title: String, bundle: String, app: String, x: Double) -> WindowSnapshot {
@@ -307,7 +307,7 @@ enum SelfTest {
 
         group("忽略的应用选择器")
 
-        let suiteName = "com.windowsnap.selftest"
+        let suiteName = "com.layoutsnap.selftest"
         let testDefaults = UserDefaults(suiteName: suiteName) ?? UserDefaults.standard
         testDefaults.removePersistentDomain(forName: suiteName)
         let testSettings = AppSettings(defaults: testDefaults)
@@ -373,7 +373,7 @@ enum SelfTest {
         check(KeyCodeMap.menuKeyEquivalent(36) == "\r", "回车在菜单里的等价键正确")
         check(KeyCodeMap.modifierDisplay(HotKeySpec.control | HotKeySpec.command) == "⌃⌘", "修饰键显示顺序")
 
-        let actionSuite = "com.windowsnap.selftest.actions"
+        let actionSuite = "com.layoutsnap.selftest.actions"
         let actionDefaults = UserDefaults(suiteName: actionSuite) ?? UserDefaults.standard
         actionDefaults.removePersistentDomain(forName: actionSuite)
         let actionSettings = AppSettings(defaults: actionDefaults)
@@ -408,7 +408,7 @@ enum SelfTest {
         let cacheThird = ScreenGeometry.currentDisplays
         check(cacheThird.count == cacheFirst.count, "清掉缓存后重新查询结果一致")
 
-        let perfSuite = "com.windowsnap.selftest.perf"
+        let perfSuite = "com.layoutsnap.selftest.perf"
         let perfDefaults = UserDefaults(suiteName: perfSuite) ?? UserDefaults.standard
         perfDefaults.removePersistentDomain(forName: perfSuite)
         let perfSettings = AppSettings(defaults: perfDefaults)

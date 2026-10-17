@@ -52,7 +52,7 @@ struct GeneralSettingsView: View {
                         Text(trusted ? "辅助功能权限已获得" : "缺少辅助功能权限")
                             .font(.headline)
                         Text(trusted
-                             ? "WindowSnap 可以读写窗口的位置和大小了。"
+                             ? "布局快照 可以读写窗口的位置和大小了。"
                              : "没有这个权限，扫描和恢复窗口都会失败。")
                             .font(.caption)
                             .foregroundStyle(.secondary)
@@ -166,8 +166,8 @@ struct AboutSettingsView: View {
                         .font(.system(size: 42))
                         .foregroundStyle(Color.accentColor)
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("WindowSnap").font(.title2).bold()
-                        Text("窗口布局记忆工具 · 版本 \(version)")
+                        Text("LayoutSnap").font(.title2).bold()
+                        Text("布局快照 · 窗口布局记忆与恢复 · 版本 \(version)")
                             .foregroundStyle(.secondary)
                         Text("基于 macOS Accessibility API 实现，不依赖私有接口。")
                             .font(.caption)
@@ -219,7 +219,7 @@ struct AboutSettingsView: View {
 
     private func exportLayouts() {
         let panel = NSSavePanel()
-        panel.nameFieldStringValue = "WindowSnap-Layouts.json"
+        panel.nameFieldStringValue = "LayoutSnap-Layouts.json"
         panel.allowedContentTypes = [.json]
         guard panel.runModal() == .OK, let url = panel.url else { return }
         do {

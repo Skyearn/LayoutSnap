@@ -24,7 +24,7 @@ final class HotKeyCenter {
     private var bindingIDByRegistration: [UInt32: String] = [:]
     private var nextRegistrationID: UInt32 = 1
 
-    private static let signature: OSType = 0x57534E50   // 'WSNP'
+    private static let signature: OSType = 0x57534E50   // 'LSNP'
 
     private init() {
         installHandler()

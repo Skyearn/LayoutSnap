@@ -8,8 +8,8 @@
 #
 set -euo pipefail
 
-NAME="WindowSnap"
-BUNDLE_ID="com.local.windowsnap"
+NAME="LayoutSnap"
+BUNDLE_ID="com.skyearn.layoutsnap"
 CONFIG="${1:-release}"
 ACTION="${2:-}"
 
@@ -57,6 +57,12 @@ fi
 if [ -f "$ROOT/Resources/AppIcon.icns" ]; then
   cp "$ROOT/Resources/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
 fi
+
+# 本地化显示名（中文系统里显示「布局快照」，其他语言回退 LayoutSnap）
+for lproj in "$ROOT/Resources"/*.lproj; do
+  [ -d "$lproj" ] || continue
+  cp -R "$lproj" "$APP/Contents/Resources/"
+done
 
 # 辅助功能授权是按「签名 + bundle id」记的。用 ad-hoc 签名的话，
 # 每次重新编译二进制变化，授权就可能失效；所以优先用本机证书签。

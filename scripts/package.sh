@@ -9,7 +9,7 @@
 #
 set -euo pipefail
 
-NAME="WindowSnap"
+NAME="LayoutSnap"
 VERSION="${1:-1.0.0}"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

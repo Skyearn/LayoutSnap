@@ -33,16 +33,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func showWelcome() {
         let alert = NSAlert()
-        alert.messageText = "欢迎使用 WindowSnap"
+        alert.messageText = "欢迎使用 LayoutSnap（布局快照）"
         alert.informativeText = """
-        WindowSnap 帮你记住「现在这些窗口分别摆在哪里」，然后一键摆回去。
+        LayoutSnap 帮你记住「现在这些窗口分别摆在哪里」，然后一键摆回去。
 
         用法：
         1. 点击菜单栏图标 › 保存当前布局，给当前这堆窗口起个名字
         2. 之后从菜单里点一下布局名（或按快捷键），窗口就会各回各位
         3. 换显示器、改分辨率也没关系，窗口会按比例投到新的屏幕上
 
-        第一步需要授权：请到「系统设置 › 隐私与安全性 › 辅助功能」里勾选 WindowSnap。
+        第一步需要授权：请到「系统设置 › 隐私与安全性 › 辅助功能」里勾选 LayoutSnap。
         """
         alert.alertStyle = .informational
         alert.addButton(withTitle: "好")

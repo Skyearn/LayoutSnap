@@ -31,21 +31,21 @@ jobs:
 
       - name: 自检
         # 自检不需要辅助功能权限，在 CI 上可以完整跑
-        run: ./build/WindowSnap.app/Contents/MacOS/WindowSnap --selftest
+        run: ./build/LayoutSnap.app/Contents/MacOS/LayoutSnap --selftest
 
       - name: 命令行模式冒烟
         run: |
-          ./build/WindowSnap.app/Contents/MacOS/WindowSnap --help
-          ./build/WindowSnap.app/Contents/MacOS/WindowSnap --doctor
+          ./build/LayoutSnap.app/Contents/MacOS/LayoutSnap --help
+          ./build/LayoutSnap.app/Contents/MacOS/LayoutSnap --doctor
 
       - name: 打包成 zip
         run: |
           mkdir -p dist
-          ditto -c -k --keepParent build/WindowSnap.app dist/WindowSnap-ci.zip
+          ditto -c -k --keepParent build/LayoutSnap.app dist/LayoutSnap-ci.zip
 
       - name: 上传构建产物
         uses: actions/upload-artifact@v7
         with:
-          name: WindowSnap-ci
-          path: dist/WindowSnap-ci.zip
+          name: LayoutSnap-ci
+          path: dist/LayoutSnap-ci.zip
           retention-days: 7

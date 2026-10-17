@@ -3,12 +3,12 @@ import AppKit
 
 /// 命令行模式：不开界面，直接把能力暴露出来，方便调试和脚本化。
 ///
-///   WindowSnap --doctor              检查权限 / 显示器 / 布局
-///   WindowSnap --scan                打印当前窗口列表
-///   WindowSnap --scan --json         以 JSON 输出
-///   WindowSnap --save "工作"          把当前窗口存成布局
-///   WindowSnap --restore "工作"       恢复布局
-///   WindowSnap --list                列出所有布局
+///   LayoutSnap --doctor              检查权限 / 显示器 / 布局
+///   LayoutSnap --scan                打印当前窗口列表
+///   LayoutSnap --scan --json         以 JSON 输出
+///   LayoutSnap --save "工作"          把当前窗口存成布局
+///   LayoutSnap --restore "工作"       恢复布局
+///   LayoutSnap --list                列出所有布局
 enum CLI {
 
     static func handle(arguments: [String]) -> Bool {
@@ -29,22 +29,22 @@ enum CLI {
             list()
             return true
         case "--check-layout":
-            guard args.count >= 2 else { fail("用法：WindowSnap --check-layout \"布局名字\"") }
+            guard args.count >= 2 else { fail("用法：LayoutSnap --check-layout \"布局名字\"") }
             checkLayout(name: args[1])
             return true
         case "--selftest":
             exit(SelfTest.run())
         case "--save":
-            guard args.count >= 2 else { fail("用法：WindowSnap --save \"布局名字\"") }
+            guard args.count >= 2 else { fail("用法：LayoutSnap --save \"布局名字\"") }
             save(name: args[1])
             return true
         case "--restore":
-            guard args.count >= 2 else { fail("用法：WindowSnap --restore \"布局名字\"") }
+            guard args.count >= 2 else { fail("用法：LayoutSnap --restore \"布局名字\"") }
             restore(name: args[1])
             return true
         case "--save-window":
             guard args.count >= 2, let index = Int(args[1]) else {
-                fail("用法：WindowSnap --save-window 序号 [布局名字]")
+                fail("用法：LayoutSnap --save-window 序号 [布局名字]")
             }
             saveWindow(index: index, name: args.count >= 3 ? args[2] : nil)
             return true
@@ -57,7 +57,7 @@ enum CLI {
 
     private static func printHelp() {
         print("""
-        WindowSnap - 窗口布局记忆工具（菜单栏应用）
+        LayoutSnap 布局快照 - 窗口布局记忆与恢复（菜单栏应用）
 
         直接运行（不带参数）会启动菜单栏图标。
 
@@ -76,10 +76,10 @@ enum CLI {
     }
 
     private static func doctor() {
-        print("WindowSnap 自检")
+        print("LayoutSnap 布局快照 自检")
         print("  辅助功能权限：\(AX.isTrusted ? "已获得 ✅" : "未获得 ❌")")
         if !AX.isTrusted {
-            print("     → 系统设置 › 隐私与安全性 › 辅助功能，勾选运行本程序的 App（终端 / WindowSnap）")
+            print("     → 系统设置 › 隐私与安全性 › 辅助功能，勾选运行本程序的 App（终端 / LayoutSnap）")
         }
 
         let displays = ScreenGeometry.currentDisplays

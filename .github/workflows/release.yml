@@ -70,7 +70,7 @@ jobs:
         run: ./scripts/package.sh "$VERSION"
 
       - name: 自检
-        run: ./build/WindowSnap.app/Contents/MacOS/WindowSnap --selftest
+        run: ./build/LayoutSnap.app/Contents/MacOS/LayoutSnap --selftest
 
       # --- 可选：公证 ---------------------------------------------------
       # 需要 APPLE_ID / APPLE_TEAM_ID / APPLE_APP_PASSWORD 三个 secret
@@ -86,16 +86,16 @@ jobs:
             echo "没有配置公证用的 secrets，跳过"
             exit 0
           fi
-          xcrun notarytool submit "dist/WindowSnap-$VERSION.dmg" \
+          xcrun notarytool submit "dist/LayoutSnap-$VERSION.dmg" \
             --apple-id "$APPLE_ID" \
             --team-id "$APPLE_TEAM_ID" \
             --password "$APPLE_APP_PASSWORD" \
             --wait
-          xcrun stapler staple "dist/WindowSnap-$VERSION.dmg"
-          xcrun stapler staple build/WindowSnap.app
+          xcrun stapler staple "dist/LayoutSnap-$VERSION.dmg"
+          xcrun stapler staple build/LayoutSnap.app
           # staple 之后重新压一份 zip，让它也带上装订票据
-          rm -f "dist/WindowSnap-$VERSION.zip"
-          ditto -c -k --keepParent build/WindowSnap.app "dist/WindowSnap-$VERSION.zip"
+          rm -f "dist/LayoutSnap-$VERSION.zip"
+          ditto -c -k --keepParent build/LayoutSnap.app "dist/LayoutSnap-$VERSION.zip"
 
       - name: 生成校验和
         working-directory: dist
@@ -106,7 +106,7 @@ jobs:
       - name: 发布 Release
         uses: softprops/action-gh-release@v3
         with:
-          name: WindowSnap ${{ steps.version.outputs.version }}
+          name: LayoutSnap ${{ steps.version.outputs.version }}
           tag_name: ${{ steps.version.outputs.tag }}
           generate_release_notes: true
           draft: false

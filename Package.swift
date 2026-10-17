@@ -2,17 +2,17 @@
 import PackageDescription
 
 let package = Package(
-    name: "WindowSnap",
+    name: "LayoutSnap",
     platforms: [
         .macOS(.v13)
     ],
     products: [
-        .executable(name: "WindowSnap", targets: ["WindowSnap"])
+        .executable(name: "LayoutSnap", targets: ["LayoutSnap"])
     ],
     targets: [
         .executableTarget(
-            name: "WindowSnap",
-            path: "Sources/WindowSnap"
+            name: "LayoutSnap",
+            path: "Sources/LayoutSnap"
         )
     ]
 )

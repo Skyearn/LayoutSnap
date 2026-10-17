@@ -45,7 +45,7 @@ final class SettingsWindowController: NSWindowController {
                               styleMask: [.titled, .closable, .miniaturizable, .resizable],
                               backing: .buffered,
                               defer: false)
-        window.title = "WindowSnap 设置"
+        window.title = "布局快照 设置"
         window.titlebarAppearsTransparent = false
         window.isReleasedWhenClosed = false
         window.minSize = NSSize(width: 720, height: 480)

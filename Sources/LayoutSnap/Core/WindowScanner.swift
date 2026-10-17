@@ -38,7 +38,7 @@ enum WindowScanner {
         var collected: [WindowSnapshot] = []
         let semaphore = DispatchSemaphore(value: max(1, options.maxConcurrentApps))
         let group = DispatchGroup()
-        let workers = DispatchQueue(label: "com.windowsnap.scan", attributes: .concurrent)
+        let workers = DispatchQueue(label: "com.layoutsnap.scan", attributes: .concurrent)
 
         for entry in apps {
             semaphore.wait()
