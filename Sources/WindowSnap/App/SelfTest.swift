@@ -55,12 +55,15 @@ enum SelfTest {
         // 显示器不在了 -> 投影到别的屏
         group("显示器丢失时的重投影")
 
+        // 用一个现实中不可能存在的坐标，避免和这台机器真实的屏幕排列撞上
+        let goneDisplay = CGRect(x: 100_000, y: 100_000, width: 1600, height: 1000)
+        let goneWindow = CGRect(x: 100_100, y: 100_100, width: 900, height: 700)
         let snapshot = WindowSnapshot(
             bundleID: "com.test.app", appName: "Test", title: "窗口", role: "AXWindow", subrole: "AXStandardWindow",
-            frame: Frame(window),
+            frame: Frame(goneWindow),
             displayID: 999999, displayIndex: 5, displayName: "已经拔掉的屏",
-            displayFrame: Frame(leftDisplay),
-            relativeFrame: relative,
+            displayFrame: Frame(goneDisplay),
+            relativeFrame: Frame(goneWindow).relative(to: goneDisplay),
             isMinimized: false, isFullScreen: false, zIndex: 0)
 
         let resolved = ScreenGeometry.resolveTarget(for: snapshot)

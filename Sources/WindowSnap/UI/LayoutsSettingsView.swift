@@ -53,9 +53,9 @@ struct LayoutsSettingsView: View {
                         .foregroundStyle(.secondary)
                     Text("还没有布局")
                         .foregroundStyle(.secondary)
-                    Button("保存当前窗口布局") { controller.saveCurrentWindowLayout() }
-                    Button("保存部分窗口布局") { controller.savePartialWindowsLayout() }
-                    Button("保存所有窗口布局") { controller.saveAllWindowsLayout() }
+                    Button("添加当前窗口") { controller.saveCurrentWindowLayout() }
+                    Button("添加部分窗口") { controller.savePartialWindowsLayout() }
+                    Button("保存所有窗口") { controller.saveAllWindowsLayout() }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
@@ -88,27 +88,27 @@ struct LayoutsSettingsView: View {
             Divider()
             HStack(spacing: 8) {
                 Menu {
-                    Menu("保存当前窗口布局") {
+                    Menu("添加当前窗口") {
                         ForEach(store.layouts) { layout in
-                            Button("存进「\(layout.displayName)」") {
+                            Button("添加到「\(layout.displayName)」") {
                                 controller.saveCurrentWindow(into: layout)
                             }
                         }
                         if store.layouts.isEmpty == false { Divider() }
                         Button("新建布局…") { controller.saveCurrentWindowLayout() }
                     }
-                    Menu("保存部分窗口布局") {
+                    Menu("添加部分窗口") {
                         ForEach(store.layouts) { layout in
-                            Button("存进「\(layout.displayName)」") {
+                            Button("添加到「\(layout.displayName)」") {
                                 controller.savePartialWindows(into: layout)
                             }
                         }
                         if store.layouts.isEmpty == false { Divider() }
                         Button("新建布局…") { controller.savePartialWindowsLayout() }
                     }
-                    Menu("保存所有窗口布局") {
+                    Menu("保存所有窗口") {
                         ForEach(store.layouts) { layout in
-                            Button("存进「\(layout.displayName)」") {
+                            Button("覆盖「\(layout.displayName)」") {
                                 controller.saveAllWindows(into: layout)
                             }
                         }

@@ -12,9 +12,9 @@ enum AppAction: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .restoreLayout: return "恢复布局"
-        case .saveCurrentWindow: return "保存当前窗口布局"
-        case .savePartialWindows: return "保存部分窗口布局"
-        case .saveAllWindows: return "保存所有窗口布局"
+        case .saveCurrentWindow: return "添加当前窗口"
+        case .savePartialWindows: return "添加部分窗口"
+        case .saveAllWindows: return "保存所有窗口"
         }
     }
 
@@ -32,11 +32,11 @@ enum AppAction: String, CaseIterable, Identifiable {
         case .restoreLayout:
             return "恢复最近用过的那个布局；没有用过的话会打开菜单让你挑"
         case .saveCurrentWindow:
-            return "只把当前正在用的那个窗口（最前面应用的焦点窗口）存成一个布局"
+            return "把当前正在用的那个窗口（最前面应用的焦点窗口）加到最近使用的布局里"
         case .savePartialWindows:
-            return "打开窗口列表，勾选需要的几个窗口存成布局"
+            return "打开窗口列表，勾选需要的几个窗口加到最近使用的布局里"
         case .saveAllWindows:
-            return "把当前所有窗口存成一个布局"
+            return "把当前所有窗口保存成布局；选择已有布局时会整体覆盖它"
         }
     }
 

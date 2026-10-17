@@ -117,26 +117,29 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         menu.addItem(.separator())
 
         // ---- 三个保存动作
-        let saveCurrent = NSMenuItem(title: "保存当前窗口布局", action: nil, keyEquivalent: "")
+        let saveCurrent = NSMenuItem(title: "添加当前窗口", action: nil, keyEquivalent: "")
         saveCurrent.submenu = makeSaveMenu(newTitle: "新建布局…",
                                           newAction: #selector(saveCurrentWindowNew),
                                           intoAction: #selector(saveCurrentWindowInto(_:)),
+                                          itemVerb: "添加到",
                                           hotKey: settings.hotKey(for: .saveCurrentWindow))
         saveCurrent.isEnabled = controller.isRestoring == false
         menu.addItem(saveCurrent)
 
-        let savePartial = NSMenuItem(title: "保存部分窗口布局", action: nil, keyEquivalent: "")
+        let savePartial = NSMenuItem(title: "添加部分窗口", action: nil, keyEquivalent: "")
         savePartial.submenu = makeSaveMenu(newTitle: "新建布局…",
                                           newAction: #selector(savePartialNew),
                                           intoAction: #selector(savePartialInto(_:)),
+                                          itemVerb: "添加到",
                                           hotKey: settings.hotKey(for: .savePartialWindows))
         savePartial.isEnabled = controller.isRestoring == false
         menu.addItem(savePartial)
 
-        let saveAll = NSMenuItem(title: "保存所有窗口布局", action: nil, keyEquivalent: "")
+        let saveAll = NSMenuItem(title: "保存所有窗口", action: nil, keyEquivalent: "")
         saveAll.submenu = makeSaveMenu(newTitle: "新建布局…",
                                       newAction: #selector(saveAllNew),
                                       intoAction: #selector(saveAllInto(_:)),
+                                      itemVerb: "覆盖",
                                       hotKey: settings.hotKey(for: .saveAllWindows))
         saveAll.isEnabled = controller.isRestoring == false
         menu.addItem(saveAll)
@@ -184,6 +187,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     private func makeSaveMenu(newTitle: String,
                              newAction: Selector,
                              intoAction: Selector,
+                             itemVerb: String,
                              hotKey: HotKeySpec?) -> NSMenu {
         let submenu = NSMenu()
         let newItem = NSMenuItem(title: newTitle, action: newAction, keyEquivalent: "")
@@ -197,7 +201,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         }
 
         for layout in layouts {
-            let item = NSMenuItem(title: layout.displayName, action: intoAction, keyEquivalent: "")
+            let item = NSMenuItem(title: "\(itemVerb)「\(layout.displayName)」", action: intoAction, keyEquivalent: "")
             item.target = self
             item.representedObject = layout.id.uuidString
             submenu.addItem(item)

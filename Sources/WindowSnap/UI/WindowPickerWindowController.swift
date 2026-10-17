@@ -4,15 +4,12 @@ import SwiftUI
 /// 打开选择器之前就已经决定好「存到哪儿」
 enum WindowPickerPurpose {
     case createNew(name: String)
-    case replace(layout: Layout)
     case append(layout: Layout)
 
     var summary: String {
         switch self {
         case .createNew(let name):
             return "存成新布局「\(name)」"
-        case .replace(let layout):
-            return "替换「\(layout.displayName)」里的窗口（原本 \(layout.windows.count) 个）"
         case .append(let layout):
             return "加入「\(layout.displayName)」（原本 \(layout.windows.count) 个）"
         }
@@ -22,7 +19,7 @@ enum WindowPickerPurpose {
     var existingLayout: Layout? {
         switch self {
         case .createNew: return nil
-        case .replace(let layout), .append(let layout): return layout
+        case .append(let layout): return layout
         }
     }
 }
@@ -222,8 +219,6 @@ struct WindowPickerView: View {
         switch purpose {
         case .createNew(let name):
             return "保存为「\(name)」"
-        case .replace(let layout):
-            return "替换「\(layout.displayName)」"
         case .append(let layout):
             return "加入「\(layout.displayName)」"
         }

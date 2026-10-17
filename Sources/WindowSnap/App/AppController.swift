@@ -127,6 +127,24 @@ final class AppController: ObservableObject {
         restore(layout: layout)
     }
 
+    /// 快捷键「添加当前窗口」：加到最近使用的布局；还没有可用布局时新建一个
+    private func addCurrentWindowToRecentLayout() {
+        if let layout = lastUsedLayout {
+            saveCurrentWindow(into: layout)
+        } else {
+            saveCurrentWindowLayout()
+        }
+    }
+
+    /// 快捷键「添加部分窗口」：同上，挑好窗口后加到最近使用的布局
+    private func addPartialWindowsToRecentLayout() {
+        if let layout = lastUsedLayout {
+            savePartialWindows(into: layout)
+        } else {
+            savePartialWindowsLayout()
+        }
+    }
+
     private func applyHotKeyBindings(_ bindings: [HotKeyBinding]) {
         currentBindings = bindings
         guard hotKeysSuspended == false else { return }
@@ -171,9 +189,9 @@ final class AppController: ObservableObject {
         case .restoreLayout:
             restoreLastUsedLayout()
         case .saveCurrentWindow:
-            saveCurrentWindowLayout()
+            addCurrentWindowToRecentLayout()
         case .savePartialWindows:
-            savePartialWindowsLayout()
+            addPartialWindowsToRecentLayout()
         case .saveAllWindows:
             saveAllWindowsLayout()
         }
@@ -300,8 +318,10 @@ final class AppController: ObservableObject {
                                      message: "请先把要保存的那个窗口点到最前面，再试一次。")
                     return
                 }
-                self.store.replaceWindows([snapshot], in: layout.id)
-                self.statusBar?.flash("已把当前窗口存进「\(layout.displayName)」")
+                // 追加：同一个应用 + 同一标题的窗口已在布局里时，只更新它那一条
+                self.store.addWindows([snapshot], to: layout.id)
+                self.settings.lastUsedLayoutID = layout.id.uuidString
+                self.statusBar?.flash("已把当前窗口添加到「\(layout.displayName)」")
             }
         }
     }
@@ -318,13 +338,14 @@ final class AppController: ObservableObject {
                 return
             }
             self.store.replaceWindows(snapshots, in: layout.id)
-            self.statusBar?.flash("已把 \(snapshots.count) 个窗口存进「\(layout.displayName)」")
+            self.settings.lastUsedLayoutID = layout.id.uuidString
+            self.statusBar?.flash("已用 \(snapshots.count) 个窗口覆盖「\(layout.displayName)」")
         }
     }
 
-    /// 把挑出来的窗口存进指定布局（整批替换）
+    /// 把挑出来的窗口添加到指定布局（追加，不动布局里原有的窗口）
     func savePartialWindows(into layout: Layout) {
-        openWindowPicker(purpose: .replace(layout: layout))
+        openWindowPicker(purpose: .append(layout: layout))
     }
 
     /// 选择器里点了确认：按当初的意图落到对应的布局上
@@ -334,11 +355,9 @@ final class AppController: ObservableObject {
         case .createNew(let name):
             let layout = store.add(name: name, windows: snapshots)
             statusBar?.flash("已保存「\(layout.displayName)」\(snapshots.count) 个窗口")
-        case .replace(let layout):
-            store.replaceWindows(snapshots, in: layout.id)
-            statusBar?.flash("已用 \(snapshots.count) 个窗口替换「\(layout.displayName)」")
         case .append(let layout):
             addWindows(snapshots, to: layout)
+            settings.lastUsedLayoutID = layout.id.uuidString
         }
     }
 
