@@ -177,6 +177,16 @@ final class StatusBarController: NSObject, NSMenuDelegate {
 
         menu.addItem(.separator())
 
+        // 恢复时是否自动拉起未运行的应用
+        let launchItem = NSMenuItem(title: "恢复时启动未运行的应用",
+                                    action: #selector(toggleLaunchMissingApps),
+                                    keyEquivalent: "")
+        launchItem.target = self
+        launchItem.state = settings.launchMissingAppsOnRestore ? .on : .off
+        menu.addItem(launchItem)
+
+        menu.addItem(.separator())
+
         let settingsItem = NSMenuItem(title: "设置…", action: #selector(openSettings), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
@@ -378,6 +388,15 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     @objc private func saveAllWindowsInto(_ sender: NSMenuItem) {
         guard let layout = layout(from: sender) else { return }
         controller?.replaceAllWindows(in: layout)
+    }
+
+    @objc private func toggleLaunchMissingApps() {
+        guard let controller else { return }
+        let settings = controller.settings
+        settings.launchMissingAppsOnRestore.toggle()
+        controller.statusBar?.flash(
+            settings.launchMissingAppsOnRestore ? "恢复时将启动未运行的应用" : "恢复时不会启动未运行的应用",
+            state: .success, duration: 2)
     }
 
     @objc private func openSettings() {

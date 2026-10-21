@@ -416,6 +416,10 @@ enum SelfTest {
         perfSettings.parallelWorkers = 8
         check(AppSettings(defaults: perfDefaults).parallelWorkers == 8, "并行数改动会持久化")
         check(perfSettings.restorerOptions.maxConcurrentApps == 8, "恢复选项跟着设置走")
+        check(perfSettings.launchMissingAppsOnRestore, "默认恢复时会启动未运行的应用")
+        check(perfSettings.restorerOptions.launchMissingApps, "恢复选项里带了「自动启动应用」")
+        perfSettings.launchMissingAppsOnRestore = false
+        check(perfSettings.restorerOptions.launchMissingApps == false, "关掉之后恢复选项也跟着关")
         perfDefaults.removePersistentDomain(forName: perfSuite)
 
         group("显示器识别（重启后 displayID 会变）")

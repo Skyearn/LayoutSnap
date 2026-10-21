@@ -48,6 +48,12 @@ final class AppSettings: ObservableObject {
         didSet { persist() }
     }
 
+    /// 恢复布局时，是否自动启动布局里记录、但当前没有运行的应用。
+    /// 关闭后，这些窗口会被跳过（在菜单里可以直接切换）。
+    @Published var launchMissingAppsOnRestore: Bool = true {
+        didSet { persist() }
+    }
+
     /// 忽略这些应用（bundle id，换行或逗号分隔）
     @Published var excludedBundleIDsText: String = "" {
         didSet { persist() }
@@ -133,7 +139,8 @@ final class AppSettings: ObservableObject {
         let keys = ["launchAtLogin", "appLaunchTimeout", "compatibilityMode", "restoreStackingOrder",
                     "restoreFullScreenWindows", "showResultInMenuBar", "parallelWorkers",
                     "excludedBundleIDsText", "autoRestoreOnDisplayChange", "displayChangeLayoutID",
-                    "autoRestoreOnAppLaunch", "lastUsedLayoutID", "actionHotKeys", "hasShownWelcome"]
+                    "autoRestoreOnAppLaunch", "lastUsedLayoutID", "actionHotKeys", "hasShownWelcome",
+                    "launchMissingAppsOnRestore"]
         var migrated = 0
         for key in keys {
             guard let value = legacy.object(forKey: key) else { continue }
@@ -167,6 +174,9 @@ final class AppSettings: ObservableObject {
         if defaults.object(forKey: "parallelWorkers") != nil {
             parallelWorkers = max(1, min(8, defaults.integer(forKey: "parallelWorkers")))
         }
+        if defaults.object(forKey: "launchMissingAppsOnRestore") != nil {
+            launchMissingAppsOnRestore = defaults.bool(forKey: "launchMissingAppsOnRestore")
+        }
         excludedBundleIDsText = defaults.string(forKey: "excludedBundleIDsText") ?? ""
         autoRestoreOnDisplayChange = defaults.bool(forKey: "autoRestoreOnDisplayChange")
         if defaults.object(forKey: "autoRestoreOnAppLaunch") != nil {
@@ -199,6 +209,7 @@ final class AppSettings: ObservableObject {
         defaults.set(restoreFullScreenWindows, forKey: "restoreFullScreenWindows")
         defaults.set(showResultInMenuBar, forKey: "showResultInMenuBar")
         defaults.set(parallelWorkers, forKey: "parallelWorkers")
+        defaults.set(launchMissingAppsOnRestore, forKey: "launchMissingAppsOnRestore")
         defaults.set(excludedBundleIDsText, forKey: "excludedBundleIDsText")
         defaults.set(autoRestoreOnDisplayChange, forKey: "autoRestoreOnDisplayChange")
         defaults.set(displayChangeLayoutID, forKey: "displayChangeLayoutID")
@@ -261,6 +272,7 @@ final class AppSettings: ObservableObject {
         options.restoreStackingOrder = restoreStackingOrder
         options.restoreFullScreenWindows = restoreFullScreenWindows
         options.maxConcurrentApps = parallelWorkers
+        options.launchMissingApps = launchMissingAppsOnRestore
         return options
     }
 

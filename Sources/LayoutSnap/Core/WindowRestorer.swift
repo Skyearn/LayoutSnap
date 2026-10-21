@@ -134,8 +134,14 @@ final class WindowRestorer {
                                    options: options,
                                    wasRunning: wasRunning,
                                    progress: progress) else {
-            appReport.failed += snapshots.count
-            appReport.notes.append("\(appName)：无法启动")
+            // 应用没运行，且用户关掉了「恢复时启动未运行的应用」
+            if wasRunning == false && options.launchMissingApps == false {
+                appReport.skipped += snapshots.count
+                appReport.notes.append("\(appName)：未运行，已跳过")
+            } else {
+                appReport.failed += snapshots.count
+                appReport.notes.append("\(appName)：无法启动")
+            }
             return (appReport, restored)
         }
 

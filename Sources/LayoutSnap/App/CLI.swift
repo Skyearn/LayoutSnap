@@ -90,6 +90,9 @@ enum CLI {
                   + "尺寸=\(Int(display.frame.width))x\(Int(display.frame.height))")
         }
 
+        let settings = AppSettings.shared
+        print("  恢复时启动未运行的应用：\(settings.launchMissingAppsOnRestore ? "是" : "否")")
+        print("  并行处理的应用数：\(settings.parallelWorkers)")
         print("  功能快捷键：")
         for action in AppAction.allCases {
             let spec = AppSettings.shared.hotKey(for: action)
