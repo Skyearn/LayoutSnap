@@ -178,7 +178,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         menu.addItem(.separator())
 
         // 恢复时是否自动拉起未运行的应用
-        let launchItem = NSMenuItem(title: "恢复时启动未运行的应用",
+        let launchItem = NSMenuItem(title: "启动未运行应用",
                                     action: #selector(toggleLaunchMissingApps),
                                     keyEquivalent: "")
         launchItem.target = self
