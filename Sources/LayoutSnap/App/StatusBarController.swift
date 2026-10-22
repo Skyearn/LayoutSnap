@@ -111,6 +111,16 @@ final class StatusBarController: NSObject, NSMenuDelegate {
             if controller.isRestoring { item.isEnabled = false }
             restoreMenu.addItem(item)
         }
+        if store.layouts.isEmpty == false {
+            // 恢复行为开关：放在布局列表下面，和布局并列但不干扰选择
+            restoreMenu.addItem(.separator())
+            let launchItem = NSMenuItem(title: "启动未运行应用",
+                                        action: #selector(toggleLaunchMissingApps),
+                                        keyEquivalent: "")
+            launchItem.target = self
+            launchItem.state = settings.launchMissingAppsOnRestore ? .on : .off
+            restoreMenu.addItem(launchItem)
+        }
         restoreItem.submenu = restoreMenu
         menu.addItem(restoreItem)
 
@@ -174,16 +184,6 @@ final class StatusBarController: NSObject, NSMenuDelegate {
             manageItem.submenu = manageMenu
             menu.addItem(manageItem)
         }
-
-        menu.addItem(.separator())
-
-        // 恢复时是否自动拉起未运行的应用
-        let launchItem = NSMenuItem(title: "启动未运行应用",
-                                    action: #selector(toggleLaunchMissingApps),
-                                    keyEquivalent: "")
-        launchItem.target = self
-        launchItem.state = settings.launchMissingAppsOnRestore ? .on : .off
-        menu.addItem(launchItem)
 
         menu.addItem(.separator())
 
