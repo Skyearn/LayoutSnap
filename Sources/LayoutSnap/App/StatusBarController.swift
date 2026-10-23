@@ -145,6 +145,9 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         addPartial.isEnabled = controller.isRestoring == false
         menu.addItem(addPartial)
 
+        // 分隔线：上面两项是「添加 = 追加」，下面两项是「保存 = 覆盖」
+        menu.addItem(.separator())
+
         let savePartial = NSMenuItem(title: "保存部分窗口", action: nil, keyEquivalent: "")
         savePartial.submenu = makeSaveMenu(newTitle: "新建布局…",
                                            newAction: #selector(savePartialWindowsNew),
