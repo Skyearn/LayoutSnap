@@ -379,8 +379,9 @@ final class AppController: ObservableObject {
             let layout = store.add(name: name, windows: snapshots)
             statusBar?.flash("已保存「\(layout.displayName)」\(snapshots.count) 个窗口")
         case .append(let layout):
-            addWindows(snapshots, to: layout)
+            let result = store.addWindows(snapshots, to: layout.id)
             settings.lastUsedLayoutID = layout.id.uuidString
+            statusBar?.flash(addResultMessage(result, layout: layout))
         case .replace(let layout):
             store.replaceWindows(snapshots, in: layout.id)
             settings.lastUsedLayoutID = layout.id.uuidString
@@ -584,8 +585,20 @@ final class AppController: ObservableObject {
 
     func addWindows(_ snapshots: [WindowSnapshot], to layout: Layout) {
         guard snapshots.isEmpty == false else { return }
-        store.addWindows(snapshots, to: layout.id)
-        statusBar?.flash("已往「\(layout.displayName)」里加入 \(snapshots.count) 个窗口")
+        let result = store.addWindows(snapshots, to: layout.id)
+        settings.lastUsedLayoutID = layout.id.uuidString
+        statusBar?.flash(addResultMessage(result, layout: layout))
+    }
+
+    /// 添加结果的提示：区分「新增」和「更新了已有记录」
+    private func addResultMessage(_ result: (added: Int, updated: Int), layout: Layout) -> String {
+        if result.added == 0 && result.updated > 0 {
+            return "这 \(result.updated) 个窗口已在「\(layout.displayName)」中，已更新位置"
+        }
+        if result.updated == 0 {
+            return "已往「\(layout.displayName)」加入 \(result.added) 个窗口"
+        }
+        return "已往「\(layout.displayName)」加入 \(result.added) 个窗口，更新 \(result.updated) 个"
     }
 
     // MARK: - 单个窗口的编辑窗口

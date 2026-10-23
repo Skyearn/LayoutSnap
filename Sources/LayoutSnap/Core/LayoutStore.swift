@@ -195,22 +195,37 @@ final class LayoutStore: ObservableObject {
 
     /// 往布局里加窗口。
     /// 同一个应用 + 同一个标题的窗口已经在里面时，用新位置覆盖它，而不是加出一条重复记录。
-    func addWindows(_ snapshots: [WindowSnapshot], to layoutID: UUID) {
-        guard let index = layouts.firstIndex(where: { $0.id == layoutID }) else { return }
+    @discardableResult
+    func addWindows(_ snapshots: [WindowSnapshot], to layoutID: UUID) -> (added: Int, updated: Int) {
+        guard let index = layouts.firstIndex(where: { $0.id == layoutID }) else { return (0, 0) }
+
+        var added = 0
+        var updated = 0
+        // 每条已有记录本次操作最多被消费一次：
+        // 两个同应用同标题的窗口不会互相覆盖，第二个会作为新记录追加
+        var consumed = Set<UUID>()
+
         for var snapshot in snapshots {
+            let key = snapshot.matchKey
             let existing = layouts[index].windows.firstIndex {
-                $0.bundleID == snapshot.bundleID && $0.displayTitle == snapshot.displayTitle
+                $0.matchKey == key && consumed.contains($0.id) == false
             }
             if let existing {
                 snapshot.id = layouts[index].windows[existing].id
                 layouts[index].windows[existing] = snapshot
+                consumed.insert(snapshot.id)
+                updated += 1
             } else {
                 layouts[index].windows.append(snapshot)
+                consumed.insert(snapshot.id)
+                added += 1
             }
         }
+
         renumber(&layouts[index])
         layouts[index].updatedAt = Date()
         save()
+        return (added, updated)
     }
 
     /// 用一批新窗口整个替换掉某个布局的内容（「保存到已有布局」用）

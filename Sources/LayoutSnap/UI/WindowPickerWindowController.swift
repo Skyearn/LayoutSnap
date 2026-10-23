@@ -92,6 +92,12 @@ struct WindowPickerView: View {
     let onConfirm: ([WindowSnapshot]) -> Void
     let onCancel: () -> Void
 
+    /// 目标布局里已经存在的窗口（按「应用 + 归一化标题」判定）
+    private var existingKeys: Set<String> {
+        guard case .append(let layout) = purpose else { return [] }
+        return Set(layout.windows.map(\.matchKey))
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             header
@@ -117,9 +123,16 @@ struct WindowPickerView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-            Text("目标：\(purpose.summary)")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            HStack(spacing: 6) {
+                Text("目标：\(purpose.summary)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                if case .append = purpose {
+                    Text("· 标记「已在布局中」的窗口会更新其位置")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
         }
         .padding(12)
     }
@@ -196,6 +209,14 @@ struct WindowPickerView: View {
                     .lineLimit(1)
             }
             Spacer()
+            if existingKeys.contains(snapshot.matchKey) {
+                Text("已在布局中")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Capsule().fill(Color.secondary.opacity(0.15)))
+            }
         }
         .padding(.vertical, 2)
         .padding(.horizontal, 4)

@@ -157,6 +157,12 @@ struct WindowSnapshot: Codable, Identifiable, Hashable {
         return trimmed.isEmpty ? appName : trimmed
     }
 
+    /// 「同一个窗口」的判定键：同一应用 + 归一化标题。
+    /// 添加窗口到已有布局时用它判断是否已存在。
+    var matchKey: String {
+        bundleID + "|" + WindowMatcher.normalizeTitle(title)
+    }
+
     /// 恢复时真正拿去匹配的文本
     var effectiveMatchTitle: String {
         if let matchTitle, matchTitle.isEmpty == false {

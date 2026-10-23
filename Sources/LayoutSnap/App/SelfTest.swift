@@ -490,6 +490,36 @@ enum SelfTest {
         check(ScreenGeometry.persistentUUID(of: CGMainDisplayID()).isEmpty == false,
               "主屏能取到稳定的 EDID UUID")
 
+        group("添加窗口的去重与计数")
+
+        let dupDir = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("layoutsnap-dup-\(UUID().uuidString)", isDirectory: true)
+        let dupStore = LayoutStore(directory: dupDir)
+
+        let tabA = makeSnapshot("新标签页", bundle: "com.test.browser", app: "浏览器", x: 100)
+        let tabB = makeSnapshot("新标签页", bundle: "com.test.browser", app: "浏览器", x: 300)
+        let doc = makeSnapshot("文档", bundle: "com.test.browser", app: "浏览器", x: 500)
+        let dupLayout = dupStore.add(name: "去重测试", windows: [tabA, doc])
+
+        // 两个同名窗口，布局里本来只有一条同名记录
+        var tabB2 = tabB
+        tabB2.frame = Frame(x: 700, y: 100, width: 600, height: 400)
+        let result = dupStore.addWindows([tabB2, tabB], to: dupLayout.id)
+        check(result.updated == 1, "同名窗口的第一条更新了已有记录")
+        check(result.added == 1, "同名窗口的第二条作为新记录追加")
+        check(dupStore.layout(id: dupLayout.id)?.windows.count == 3, "两个同名窗口没有互相覆盖")
+
+        // 重复添加同一组窗口 -> 只更新，不新增
+        let again = dupStore.addWindows([tabA], to: dupLayout.id)
+        check(again.added == 0 && again.updated == 1, "重复添加只更新已有记录")
+        check(dupStore.layout(id: dupLayout.id)?.windows.count == 3, "重复添加不会增加记录数")
+
+        // 全新窗口 -> 纯新增
+        let fresh = makeSnapshot("另一个窗口", bundle: "com.test.editor", app: "编辑器", x: 900)
+        let added = dupStore.addWindows([fresh], to: dupLayout.id)
+        check(added.added == 1 && added.updated == 0, "新窗口计入新增")
+        try? FileManager.default.removeItem(at: dupDir)
+
         print("")
         print("通过 \(passed) 项，失败 \(failed) 项")
         if failed == 0 {
